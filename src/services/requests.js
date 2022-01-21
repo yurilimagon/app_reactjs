@@ -1,4 +1,4 @@
-import { api } from '../services/api';
+import { api, cep } from '../services/api';
 import axios from "axios";
 import { trackPromise } from 'react-promise-tracker';
 
@@ -200,6 +200,33 @@ export const ExcluirEnderecosUsuario = async (parametros) => {
 			params: {
 				id: parametros.id
 			}
+		})
+			.then(response => {
+				retorno = response
+			})
+			.catch(error => {
+				retorno = error.response;
+			})
+	);
+
+	return retorno;
+}
+
+//CEP
+export const VerificarCep = async (parametros) => {
+	if (requestEnderecos !== null || parametros !== undefined) {
+		if (requestEnderecos !== null) requestEnderecos();
+		if (parametros?.cancelar) return 0;
+	}
+
+	let CancelToken = axios.CancelToken;
+	let retorno = '';
+	await trackPromise(
+		cep.get(`/${parametros.cep}/json`, {
+			cancelToken: new CancelToken(function executor(c) {
+				requestEnderecos = c;
+			}),
+			// params: parametros
 		})
 			.then(response => {
 				retorno = response

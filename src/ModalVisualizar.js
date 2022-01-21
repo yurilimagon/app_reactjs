@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Modal, Button, Form, Table } from "react-bootstrap";
 import { ListarEnderecosUsuario } from "./services/requests";
+import { mascaraCpf } from './functions/mascaraCpf';
 
 const ModalVisualizar = (props) => {
   const [modal, setModal] = useState(true);

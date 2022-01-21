@@ -3,11 +3,13 @@ import { Modal, Button, Form } from "react-bootstrap";
 import {
   AdicionarUsuarios,
 } from "./services/requests";
+import { isValidCPF } from './functions/validadorCpf';
 
 const ModalAdicionarUsuario = (props) => {
   const [modal, setModal] = useState(true);
   const [nome, setNome] = useState("");
   const [cpf, setCpf] = useState("");
+  const [cpfValid, setCpfValid] = useState(false);
 
   const AdicionarUsuario = async () => {
     await AdicionarUsuarios({
@@ -30,7 +32,7 @@ const ModalAdicionarUsuario = (props) => {
     }, 500);
   }, [props]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {}, [cpfValid]);
 
   return (
     <Modal
@@ -58,14 +60,19 @@ const ModalAdicionarUsuario = (props) => {
         <Form.Group className="mb-3">
           <Form.Label>CPF</Form.Label>
           <Form.Control
+            isInvalid={!cpfValid}
+            isValid={cpfValid}
             placeholder=""
             value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
+            onChange={(e) => {
+              setCpf(e.target.value)
+              setCpfValid(isValidCPF(e.target.value))
+            }}
           />
         </Form.Group>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => AdicionarUsuario()} variant="success">
+        <Button onClick={() => AdicionarUsuario()} variant="success" disabled={!cpfValid}>
           Salvar
         </Button>
         <Button onClick={() => fecharModal()} variant="danger">

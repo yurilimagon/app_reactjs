@@ -5,6 +5,7 @@ import { ExcluirUsuarios, ListarUsuarios } from "./services/requests";
 import ModalVisualizar from "./ModalVisualizar";
 import ModalEditar from "./ModalEditar";
 import ModalAdicionarUsuario from "./ModalAdicionarUsuario";
+import { mascaraCpf } from './functions/mascaraCpf';
 
 function App() {
   const [modalVisualizar, setModalVisualizar] = useState("");
@@ -72,7 +73,7 @@ function App() {
               <tr>
                 <td>{item.id}</td>
                 <td>{item.nome}</td>
-                <td>{item.cpf}</td>
+                <td>{mascaraCpf(item.cpf)}</td>
                 <td>
                   <Button
                     variant="primary"

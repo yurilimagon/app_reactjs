@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Modal, Button, Form, Table } from "react-bootstrap";
-import { CadastrarEnderecosUsuario, ListarEnderecosUsuario } from "./services/requests";
+import { CadastrarEnderecosUsuario, ListarEnderecosUsuario, VerificarCep } from "./services/requests";
 
 const ModalNovoEndereco = (props) => {
   const [modal, setModal] = useState(true);
@@ -12,6 +12,26 @@ const ModalNovoEndereco = (props) => {
   const [cidade, setCidade] = useState("");
   const [uf, setUf] = useState("");
   const [cep, setCep] = useState("");
+  const [isCep, setIsCep] = useState(false);
+
+  const VerificaCep = async (cep) => {
+    try {
+      const response = await VerificarCep({cep: cep.replace("-","")});
+      
+      if(response.status === 200){
+        setIsCep(!response.data.erro)
+        setCidade(response.data.localidade)
+        setBairro(response.data.bairro)
+        setEndereco(response.data.logradouro)
+        setCep(response.data.cep)
+        setUf(response.data.uf)
+      }else{
+        setIsCep(false)
+      }
+    } catch (error) {
+      console.log(error.message);      
+    }
+  }
   
   const CadEnderecosUsuario = async () => {
     try {
@@ -51,7 +71,7 @@ const ModalNovoEndereco = (props) => {
 
   useEffect(() => {
     setUsuarioId(props.usuarioId)
-  }, []);
+  }, [cidade, isCep]);
 
   return (
     <Modal
@@ -68,7 +88,20 @@ const ModalNovoEndereco = (props) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form.Group className="mb-3">
+      <Form.Group className="mb-3">
+          <Form.Label>CEP</Form.Label>
+          <Form.Control
+            isInvalid={!isCep}
+            isValid={isCep}
+            placeholder=""
+            value={cep}
+            onChange={(e) => setCep(e.target.value)}
+          />
+        </Form.Group>
+        <Button onClick={() => VerificaCep(cep)} variant="success">
+          Buscar CEP
+        </Button>
+        <Form.Group className="mb-3 mt-3">
           <Form.Label>Endereço</Form.Label>
           <Form.Control
             placeholder=""
@@ -116,18 +149,10 @@ const ModalNovoEndereco = (props) => {
             onChange={(e) => setUf(e.target.value)}
           />
         </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>CEP</Form.Label>
-          <Form.Control
-            placeholder=""
-            value={cep}
-            onChange={(e) => setCep(e.target.value)}
-          />
-        </Form.Group>
 
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => CadEnderecosUsuario()} variant="success">
+        <Button onClick={() => CadEnderecosUsuario()} variant="success" disabled={!isCep}>
           Salvar
         </Button>
         <Button onClick={() => fecharModal()} variant="danger">
